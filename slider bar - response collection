@@ -1,0 +1,62 @@
+% Initialize Psychtoolbox
+Screen('Preference', 'SkipSyncTests', 1); % Skip sync tests for demo purposes
+[window, windowRect] = Screen('OpenWindow', 0, [255 255 255]); % Open a white window
+
+% Set the slider bar parameters
+sliderWidth = 400; % Width of the slider bar
+sliderHeight = 20; % Height of the slider bar
+sliderX = 100; % X position of the slider bar
+sliderY = 300; % Y position of the slider bar
+sliderColor = [0 0 0]; % Color of the slider bar
+handleColor = [255 0 0]; % Color of the slider handle
+handleWidth = 30; % Width of the slider handle
+
+% Draw the slider bar
+rectSlider = [sliderX, sliderY - sliderHeight/2, sliderX + sliderWidth, sliderY + sliderHeight/2];
+Screen('FillRect', window, sliderColor, rectSlider);
+
+% Draw the handle (initially at the start of the slider)
+handleX = sliderX;
+rectHandle = [handleX - handleWidth/2, sliderY - sliderHeight/2, handleX + handleWidth/2, sliderY + sliderHeight/2];
+Screen('FillRect', window, handleColor, rectHandle);
+
+% Display the window
+Screen('Flip', window);
+
+% Initialize variables
+mouseIsDown = 0;
+sliderValue = 0; % Slider value (0 to 1)
+
+% Main loop
+while true
+    % Check for mouse clicks
+    [mouseX, mouseY, buttons] = GetMouse(window);
+    
+    % Update slider handle position if mouse is clicked and within slider bar
+    if buttons(1) % Left mouse button
+        if mouseY >= sliderY - sliderHeight/2 && mouseY <= sliderY + sliderHeight/2
+            handleX = mouseX;
+            if handleX < sliderX
+                handleX = sliderX;
+            elseif handleX > sliderX + sliderWidth
+                handleX = sliderX + sliderWidth;
+            end
+            sliderValue = (handleX - sliderX) / sliderWidth;
+            
+            % Update handle position
+            rectHandle = [handleX - handleWidth/2, sliderY - sliderHeight/2, handleX + handleWidth/2, sliderY + sliderHeight/2];
+            Screen('FillRect', window, sliderColor, rectSlider);
+            Screen('FillRect', window, handleColor, rectHandle);
+            Screen('Flip', window);
+        end
+    end
+    
+    % Exit condition (for example, if the 'ESCAPE' key is pressed)
+    [keyIsDown, ~, keyCode] = KbCheck;
+    if keyIsDown && keyCode(KbName('ESCAPE'))
+        break;
+    end
+end
+
+% Clean up
+Screen('CloseAll');
